@@ -5,8 +5,12 @@ import com.xmajer.shopcore.productservice.data.repository.ProductRepository;
 import com.xmajer.shopcore.productservice.dto.request.CreateProductRequest;
 import com.xmajer.shopcore.productservice.dto.response.ProductResponse;
 import com.xmajer.shopcore.productservice.exception.ProductNameAlreadyExistsException;
+import com.xmajer.shopcore.productservice.exception.ProductNotFoundException;
 import com.xmajer.shopcore.productservice.mapper.ProductMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProductService {
@@ -26,5 +30,19 @@ public class ProductService {
         Product product = productMapper.toEntity(request);
         Product savedProduct = productRepository.save(product);
         return productMapper.toResponse(savedProduct);
+    }
+
+    public List<ProductResponse> getAll(){
+        return productRepository.findAll()
+                .stream()
+                .map(productMapper::toResponse)
+                .toList();
+    }
+
+    public ProductResponse getById(UUID id){
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+
+        return productMapper.toResponse(product);
     }
 }

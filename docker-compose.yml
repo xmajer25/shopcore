@@ -15,8 +15,8 @@ services:
 
   product-service:
     build:
-      context: ./product-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: product-service/Dockerfile
     container_name: shopcore-product-service
     depends_on:
       - product-db

@@ -8,12 +8,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/products")
@@ -39,5 +43,28 @@ public class ProductController {
         return ResponseEntity
                 .created(location)
                 .body(response);
+    }
+
+    @Operation(summary = "Fetches all products")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Products fetched")
+    })
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> getAll(){
+        List<ProductResponse> response = productService.getAll();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Fetches product by id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Product was fetched"),
+            @ApiResponse(responseCode = "404", description = "Product was not found")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponse> getById(@PathVariable UUID id){
+        ProductResponse response = productService.getById(id);
+
+        return ResponseEntity.ok(response);
     }
 }
