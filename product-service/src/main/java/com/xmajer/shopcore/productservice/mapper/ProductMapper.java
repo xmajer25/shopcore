@@ -6,9 +6,7 @@ import com.xmajer.shopcore.productservice.dto.response.ProductResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.time.Instant;
-
-@Mapper(componentModel = "spring", imports = Instant.class)
+@Mapper(componentModel = "spring")
 public interface ProductMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

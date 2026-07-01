@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,12 +22,9 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/products")
+@AllArgsConstructor
 public class ProductController {
     private final ProductService productService;
-
-    public ProductController(ProductService productService){
-        this.productService = productService;
-    }
 
     @Operation(summary = "Creates new product")
     @ApiResponses({

@@ -46,11 +46,11 @@ public class Product implements Serializable {
     public boolean equals(Object o){
         if(this == o) return true;
         if(!(o instanceof Product product)) return false;
-        return id.equals(product.id) && name.equals(product.name);
+        return id != null && id.equals(product.id);
     }
 
     @Override
-    public int hashCode(){
-        return 31 * name.hashCode() + id.hashCode();
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

@@ -45,14 +45,14 @@ public class GlobalExceptionHandler {
     ){
         ApiErrorResponse response = new ApiErrorResponse(
                 Instant.now(),
-                HttpStatus.CONFLICT.value(),
+                HttpStatus.NOT_FOUND.value(),
                 "Product already exists",
                 ex.getMessage(),
                 request.getRequestURI(),
                 null
         );
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(ProductNotFoundException.class)
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
     ){
         ApiErrorResponse response = new ApiErrorResponse(
                 Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.CONFLICT.value(),
                 "Product not found",
                 ex.getMessage(),
                 request.getRequestURI(),
