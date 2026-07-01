@@ -1,4 +1,4 @@
-package com.xmajer.shopcore.productservice.exception;
+package com.xmajer.shopcore.authservice.exception;
 
 import java.time.Instant;
 import java.util.Map;

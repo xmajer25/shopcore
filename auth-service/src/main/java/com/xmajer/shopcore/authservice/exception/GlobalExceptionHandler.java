@@ -1,9 +1,10 @@
-package com.xmajer.shopcore.productservice.exception;
+package com.xmajer.shopcore.authservice.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -38,40 +39,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @ExceptionHandler(ProductNameAlreadyExistsException.class)
-    public ResponseEntity<ApiErrorResponse> handleProductNameAlreadyExists(
-            ProductNameAlreadyExistsException ex,
-            HttpServletRequest request
-    ){
-        ApiErrorResponse response = new ApiErrorResponse(
-                Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
-                "Product already exists",
-                ex.getMessage(),
-                request.getRequestURI(),
-                null
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
-
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleProductNotFound(
-            ProductNotFoundException ex,
-            HttpServletRequest request
-    ){
-        ApiErrorResponse response = new ApiErrorResponse(
-                Instant.now(),
-                HttpStatus.CONFLICT.value(),
-                "Product not found",
-                ex.getMessage(),
-                request.getRequestURI(),
-                null
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
-
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiErrorResponse> handleDatabaseConflict(
             DataIntegrityViolationException ex,
@@ -104,5 +71,56 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+
+    @ExceptionHandler(UserEmailAlreadyRegisteredException.class)
+    public ResponseEntity<ApiErrorResponse> handleUserEmailAlreadyRegistered(
+            UserEmailAlreadyRegisteredException ex,
+            HttpServletRequest request
+    ){
+        ApiErrorResponse response = new ApiErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "Product with this email is already registered",
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleUserNotFound(
+            UserNotFoundException ex,
+            HttpServletRequest request
+    ){
+        ApiErrorResponse response = new ApiErrorResponse(
+                Instant.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "User not found",
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadCredentials(
+            BadCredentialsException ex,
+            HttpServletRequest request
+    ) {
+        ApiErrorResponse response = new ApiErrorResponse(
+                Instant.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                "Authentication failed",
+                "Invalid email or password.",
+                request.getRequestURI(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 }

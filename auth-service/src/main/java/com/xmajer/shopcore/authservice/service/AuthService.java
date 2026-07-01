@@ -6,20 +6,24 @@ import com.xmajer.shopcore.authservice.data.repository.UserRepository;
 import com.xmajer.shopcore.authservice.dto.request.AdminCreateUserRequest;
 import com.xmajer.shopcore.authservice.dto.request.LoginUserRequest;
 import com.xmajer.shopcore.authservice.dto.request.RegisterUserRequest;
+import com.xmajer.shopcore.authservice.dto.response.AuthResponse;
 import com.xmajer.shopcore.authservice.dto.response.UserResponse;
 import com.xmajer.shopcore.authservice.exception.UserEmailAlreadyRegisteredException;
+import com.xmajer.shopcore.authservice.exception.UserNotFoundException;
+import com.xmajer.shopcore.authservice.exception.UserNotFoundType;
 import com.xmajer.shopcore.authservice.mapper.UserMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class UserService {
+public class AuthService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final JwtSer
+    private final JwtService jwtService;
 
 
     public UserResponse registerUser(RegisterUserRequest request){
@@ -45,7 +49,21 @@ public class UserService {
         return userMapper.toResponse(userRepository.save(user));
     }
 
-    public UserResponse loginUser(LoginUserRequest request) {
+    public AuthResponse loginUser(LoginUserRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new BadCredentialsException("Invalid email or password."));
 
+        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            throw new BadCredentialsException("Invalid email or password.");
+        }
+
+        String token = jwtService.generateToken(user);
+
+        return new AuthResponse(
+                token,
+                "Bearer",
+                jwtService.getExpirationSeconds(),
+                userMapper.toResponse(user)
+        );
     }
 }

@@ -1,4 +1,9 @@
 package com.xmajer.shopcore.authservice.dto.response;
 
-public class AuthResponse {
+public record AuthResponse (
+        String accessToken,
+        String tokenType,
+        Long expiresIn,
+        UserResponse user
+) {
 }
