@@ -65,6 +65,22 @@ services:
     networks:
       - shopcore-network
 
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: shopcore-api-gateway
+    depends_on:
+      - auth-service
+      - product-service
+    environment:
+      SERVER_PORT: 8080
+      JWT_SECRET: change-this-secret-change-this-secret-123456
+    ports:
+      - "8080:8080"
+    networks:
+      - shopcore-network
+
 volumes:
   product-db-data:
   auth-db-data:
