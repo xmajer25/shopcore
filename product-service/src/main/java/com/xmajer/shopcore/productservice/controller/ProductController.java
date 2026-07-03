@@ -6,6 +6,7 @@ import com.xmajer.shopcore.productservice.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +31,12 @@ public class ProductController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Product created"),
             @ApiResponse(responseCode = "400", description = "Invalid request body"),
+            @ApiResponse(responseCode = "401", description = "Missing or invalid JWT token"),
+            @ApiResponse(responseCode = "403", description = "Admin role required"),
             @ApiResponse(responseCode = "409", description = "Product name already exists")
     })
     @PostMapping
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody CreateProductRequest request){
         ProductResponse response = productService.create(request);
 
