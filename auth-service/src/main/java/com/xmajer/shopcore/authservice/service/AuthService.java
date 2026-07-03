@@ -9,8 +9,6 @@ import com.xmajer.shopcore.authservice.dto.request.RegisterUserRequest;
 import com.xmajer.shopcore.authservice.dto.response.AuthResponse;
 import com.xmajer.shopcore.authservice.dto.response.UserResponse;
 import com.xmajer.shopcore.authservice.exception.UserEmailAlreadyRegisteredException;
-import com.xmajer.shopcore.authservice.exception.UserNotFoundException;
-import com.xmajer.shopcore.authservice.exception.UserNotFoundType;
 import com.xmajer.shopcore.authservice.mapper.UserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;

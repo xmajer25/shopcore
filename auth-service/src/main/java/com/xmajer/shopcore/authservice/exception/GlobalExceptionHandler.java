@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
         ApiErrorResponse response = new ApiErrorResponse(
                 Instant.now(),
                 HttpStatus.CONFLICT.value(),
-                "Product with this email is already registered",
+                "User with this email is already registered",
                 ex.getMessage(),
                 request.getRequestURI(),
                 null
