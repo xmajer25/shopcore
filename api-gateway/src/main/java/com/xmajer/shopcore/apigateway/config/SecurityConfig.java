@@ -23,10 +23,18 @@ public class SecurityConfig {
                 .authorizeExchange(auth -> auth
                         .pathMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-
                         .pathMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .pathMatchers(
+                                "/actuator/health",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/auth-service/v3/api-docs",
+                                "/product-service/v3/api-docs",
+                                "/order-service/v3/api-docs"
+                        ).permitAll()
 
-                        .pathMatchers("/actuator/health").permitAll()
+                        .pathMatchers("/api/orders/**").hasAnyRole("CUSTOMER", "ADMIN")
 
                         .pathMatchers("/api/admin/**").hasRole("ADMIN")
                         .pathMatchers("/api/users/**").hasRole("ADMIN")

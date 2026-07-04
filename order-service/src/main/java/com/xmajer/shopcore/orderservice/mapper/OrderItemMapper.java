@@ -9,7 +9,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface OrderItemMapper {
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "order", ignore = true)
     @Mapping(target = "productNameSnapshot", ignore = true)
     @Mapping(target = "unitPriceSnapshot", ignore = true)
