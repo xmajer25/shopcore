@@ -1,4 +1,4 @@
-package com.xmajer.shopcore.productservice.config;
+package com.xmajer.shopcore.orderservice.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;

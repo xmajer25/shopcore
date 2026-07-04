@@ -25,6 +25,19 @@ services:
       - auth-db-data:/var/lib/postgresql/data
     networks:
       - shopcore-network
+  order-db:
+    image: postgres:16-alpine
+    container_name: shopcore-order-db
+    environment:
+      POSTGRES_DB: shop_order_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - order-db-data:/var/lib/postgresql/data
+    networks:
+      - shopcore-network
 
   product-service:
     build:
@@ -65,6 +78,27 @@ services:
     networks:
       - shopcore-network
 
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    container_name: shopcore-order-service
+    depends_on:
+      - order-db
+      - product-service
+    environment:
+      SERVER_PORT: 8083
+      SPRING_DATASOURCE_URL: jdbc:postgresql://order-db:5432/shop_order_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: change-this-secret-change-this-secret-123456
+      PRODUCT_SERVICE_URL: http://product-service:8081
+    ports:
+      - "8083:8083"
+    networks:
+      - shopcore-network
+
   api-gateway:
     build:
       context: .
@@ -73,6 +107,7 @@ services:
     depends_on:
       - auth-service
       - product-service
+      - order-service
     environment:
       SERVER_PORT: 8080
       JWT_SECRET: change-this-secret-change-this-secret-123456
@@ -84,6 +119,7 @@ services:
 volumes:
   product-db-data:
   auth-db-data:
+  order-db-data:
 
 networks:
   shopcore-network:
