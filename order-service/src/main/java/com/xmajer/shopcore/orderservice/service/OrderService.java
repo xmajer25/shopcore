@@ -10,9 +10,14 @@ import com.xmajer.shopcore.orderservice.dto.response.OrderResponse;
 import com.xmajer.shopcore.orderservice.dto.response.ProductResponse;
 import com.xmajer.shopcore.orderservice.exception.EmptyOrderException;
 import com.xmajer.shopcore.orderservice.exception.NoOpenedOrderException;
+import com.xmajer.shopcore.orderservice.exception.OrderAlreadyPaymentProcessedException;
+import com.xmajer.shopcore.orderservice.exception.OrderNotFoundException;
 import com.xmajer.shopcore.orderservice.exception.ProductAlreadyInOrderException;
 import com.xmajer.shopcore.orderservice.mapper.OrderMapper;
+import com.xmajer.shopcore.orderservice.messaging.event.OrderPaymentRequestEvent;
+import com.xmajer.shopcore.orderservice.messaging.event.PaymentCompletedEvent;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +29,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final ProductClient productClient;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public OrderResponse finishOrder(UUID userId){
@@ -37,6 +43,13 @@ public class OrderService {
         openedOrder.setOrderStatus(OrderStatus.PAYMENT_PENDING);
 
         Order savedOrder = orderRepository.save(openedOrder);
+
+        eventPublisher.publishEvent(new OrderPaymentRequestEvent(
+                savedOrder.getId(),
+                savedOrder.getUserId(),
+                savedOrder.getTotalAmount()
+        ));
+
         return orderMapper.toResponse(savedOrder);
     }
 
@@ -68,5 +81,21 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
         return orderMapper.toResponse(savedOrder);
+    }
+
+    @Transactional
+    public void applyPaymentResult(PaymentCompletedEvent event) {
+        Order order = orderRepository.findById(event.orderId())
+                .orElseThrow(() -> new OrderNotFoundException(event.orderId()));
+
+        if(order.getOrderStatus() != OrderStatus.PAYMENT_PENDING){
+            throw new OrderAlreadyPaymentProcessedException(event.orderId());
+        }
+
+        OrderStatus status = event.succeeded() ? OrderStatus.PAID : OrderStatus.PAYMENT_FAILED;
+
+        order.setOrderStatus(status);
+
+        orderRepository.save(order);
     }
 }

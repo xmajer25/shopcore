@@ -1,4 +1,4 @@
-package com.xmajer.shopcore.orderservice.exception;
+package com.xmajer.shopcore.paymentservice.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -38,6 +38,40 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @ExceptionHandler(PaymentWasAlreadyPerformedException.class)
+    public ResponseEntity<ApiErrorResponse> handlePaymentWasAlreadyPerformed(
+            PaymentWasAlreadyPerformedException ex,
+            HttpServletRequest request
+    ){
+        ApiErrorResponse response = new ApiErrorResponse(
+                Instant.now(),
+                HttpStatus.CONFLICT.value(),
+                "This payment was already performed",
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(PaymentNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handlePaymentNotFound(
+            PaymentNotFoundException ex,
+            HttpServletRequest request
+    ){
+        ApiErrorResponse response = new ApiErrorResponse(
+                Instant.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Payment not found",
+                ex.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiErrorResponse> handleDatabaseConflict(
             DataIntegrityViolationException ex,
@@ -70,73 +104,5 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-    }
-
-    @ExceptionHandler(NoOpenedOrderException.class)
-    public ResponseEntity<ApiErrorResponse> handleNoOpenedOrder(
-            NoOpenedOrderException ex,
-            HttpServletRequest request
-    ){
-        ApiErrorResponse response = new ApiErrorResponse(
-                Instant.now(),
-                HttpStatus.CONFLICT.value(),
-                "No order to close",
-                ex.getMessage(),
-                request.getRequestURI(),
-                null
-        );
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
-
-    @ExceptionHandler(OrderNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleOrderNotFound(
-            OrderNotFoundException ex,
-            HttpServletRequest request
-    ){
-        ApiErrorResponse response = new ApiErrorResponse(
-                Instant.now(),
-                HttpStatus.NOT_FOUND.value(),
-                "Order does not exist",
-                ex.getMessage(),
-                request.getRequestURI(),
-                null
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
-
-    @ExceptionHandler(ProductAlreadyInOrderException.class)
-    public ResponseEntity<ApiErrorResponse> handleProductAlreadyInOrder(
-            ProductAlreadyInOrderException ex,
-            HttpServletRequest request
-    ){
-        ApiErrorResponse response = new ApiErrorResponse(
-                Instant.now(),
-                HttpStatus.CONFLICT.value(),
-                "Product duplicate in order",
-                ex.getMessage(),
-                request.getRequestURI(),
-                null
-        );
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
-
-    @ExceptionHandler(EmptyOrderException.class)
-    public ResponseEntity<ApiErrorResponse> handleEmptyOrder(
-            EmptyOrderException ex,
-            HttpServletRequest request
-    ){
-        ApiErrorResponse response = new ApiErrorResponse(
-                Instant.now(),
-                HttpStatus.CONFLICT.value(),
-                "Attempt to close empty order",
-                ex.getMessage(),
-                request.getRequestURI(),
-                null
-        );
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 }
