@@ -1,4 +1,7 @@
 services:
+  #-----------------------------------
+  #-------------DATABASES-------------
+  #-----------------------------------
   product-db:
     image: postgres:16-alpine
     container_name: shopcore-product-db
@@ -38,7 +41,23 @@ services:
       - order-db-data:/var/lib/postgresql/data
     networks:
       - shopcore-network
+  payment-db:
+    image: postgres:16-alpine
+    container_name: shopcore-payment-db
+    environment:
+      POSTGRES_DB: shop_payment_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5436:5432"
+    volumes:
+      - payment-db-data:/var/lib/postgresql/data
+    networks:
+      - shopcore-network
 
+  #-----------------------------------
+  #-------------SERVICES--------------
+  #-----------------------------------
   product-service:
     build:
       context: .
@@ -99,6 +118,31 @@ services:
     networks:
       - shopcore-network
 
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    container_name: shopcore-payment-service
+    depends_on:
+      - payment-db
+      - order-service
+    environment:
+      SERVER_PORT: 8084
+      SPRING_DATASOURCE_URL: jdbc:postgresql://payment-db:5432/shop_payment_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: change-this-secret-change-this-secret-123456
+      ORDER_SERVICE_URL: http://order-service:8083
+    ports:
+      - "8084:8084"
+    networks:
+      - shopcore-network
+
+
+  #-----------------------------------
+  #--------------GATEWAY--------------
+  #-----------------------------------
   api-gateway:
     build:
       context: .
@@ -108,6 +152,7 @@ services:
       - auth-service
       - product-service
       - order-service
+      - payment-service
     environment:
       SERVER_PORT: 8080
       JWT_SECRET: change-this-secret-change-this-secret-123456
@@ -116,10 +161,15 @@ services:
     networks:
       - shopcore-network
 
+  #-----------------------------------
+  #--------VOLUMES & NETWORKS---------
+  #-----------------------------------
+
 volumes:
   product-db-data:
   auth-db-data:
   order-db-data:
+  payment-db-data:
 
 networks:
   shopcore-network:

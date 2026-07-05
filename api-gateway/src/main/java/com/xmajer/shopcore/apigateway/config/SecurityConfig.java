@@ -31,7 +31,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/auth-service/v3/api-docs",
                                 "/product-service/v3/api-docs",
-                                "/order-service/v3/api-docs"
+                                "/order-service/v3/api-docs",
+                                "/payment-service/v3/api-docs"
                         ).permitAll()
 
                         .pathMatchers("/api/orders/**").hasAnyRole("CUSTOMER", "ADMIN")
@@ -43,6 +44,8 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.PATCH, "/api/products/**").hasRole("ADMIN")
                         .pathMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+
+                        .pathMatchers("/api/payments/**").hasAnyRole("CUSTOMER", "ADMIN")
 
                         .anyExchange().authenticated()
                 )
